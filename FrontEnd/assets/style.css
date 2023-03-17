@@ -387,3 +387,40 @@ nav a{
 nav a:active{
 	font-weight: 600;
 }
+
+
+/* category buttons */
+
+.btnContainer{
+	width: 50%;
+	display: flex;
+	justify-content: space-around;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 40px;
+}
+
+.btnContainer .btn{
+	display: inline-block;
+	font-family: 'Syne';
+	height: 37px;
+	box-sizing: border-box;
+	font-size: 16px;
+	font-weight: 700;
+	text-align: center;
+	color: #1D6154;
+	border: 1px solid #1D6154;
+	border-radius: 60px;
+	padding-top: 5px;
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-bottom: 5px;
+	background-color: transparent;
+	cursor: pointer;
+	line-height: 19px;
+}
+
+.btnContainer .btn:active, .btnContainer .btn:hover,.btnContainer .btn:focus{
+	background-color: #1D6154;
+	color: white;
+}
