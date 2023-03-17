@@ -1,7 +1,7 @@
 
 module.exports = (sequelize, DataTypes) => {
 	const Works = sequelize.define(
-		"works",
+		'works',
 		{
 		title: {
 			type: DataTypes.STRING,
@@ -13,6 +13,6 @@ module.exports = (sequelize, DataTypes) => {
 			}
 		},
 		{timestamps:false}
-	)
-	return Works
-}
+	);
+	return Works;
+};
