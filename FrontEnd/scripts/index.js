@@ -43,34 +43,23 @@ async function addCatButtons() {
 		});
 
 	const portfolio = document.querySelector('#portfolio');
-	const myProjectHeader = document.createElement('h2');
-	myProjectHeader.textContent = 'Mes Projets';
-	const nav = document.querySelector('nav');
+	const myProjectHeader = elementGenerator('h2', 'Mes projets');
+
+
 
 	if (window.sessionStorage.getItem('token') === null) {
 		const categories = await response.json();
+		const logged = 'login';
+		renderNav(logged);
 
-		nav.innerHTML = `<ul>
-			<li><a href='./index.html'>projets</a></li>
-			<li><a href='#contact'>contact</a></li>
-			<li><a href='./login.html'>login</a></li>
-			<li><img src='./assets/icons/instagram.png' alt='Instagram'></li>
-			</ul>`;
-		const btnContainer = document.createElement('div');
-		btnContainer.classList.add('btnContainer');
-		const allCat = document.createElement('button');
-		allCat.textContent = 'Tous';
-		allCat.classList.add('btn', 'all');
+		const btnContainer = elementGenerator('div', undefined, ['class=btnContainer']);
+
+		const allCat = elementGenerator('button', 'Tous', ['class=btn all']);
 		btnContainer.appendChild(allCat);
 		portfolio.prepend(btnContainer);
 		portfolio.prepend(myProjectHeader);
 		for (let cat of categories) {
-			console.log(cat);
-			const button = document.createElement('button');
-			button.setAttribute('class', 'btn');
-			button.setAttribute('data-category-id', `${cat.id}`);
-			button.textContent = `${cat.name}`;
-			console.log(button.dataset.categoryId);
+			const button = elementGenerator('button', `${cat.name}`, ['class=btn', `data-category-id=${cat.id}`]);
 			btnContainer.appendChild(button);
 		}
 
@@ -80,32 +69,51 @@ async function addCatButtons() {
 		}
 	} else {
 		publishMenu();
+
 		const works = JSON.parse(window.localStorage.getItem('works'));
-		nav.innerHTML = `<ul>
-			<li><a href="./index.html">projets</a></li>
-			<li><a href="#contact">contact</a></li>
-			<li><a id="logout" href="#">logout</a></li>
-			<li><img src="./assets/icons/instagram.png" alt="Instagram"></li>
-			</ul>`;
-		const div = document.createElement('div');
-		div.classList.add('modify');
-		const modifyLink = document.createElement('button');
-		modifyLink.classList.add('modal');
-		const span = document.createElement('span');
-		span.textContent = 'modify';
-		const icon = document.createElement('i');
-		icon.classList.add('fa-regular', 'fa-pen-to-square');
+
+		const logged = 'logout';
+		renderNav(logged);
+
+		const div = elementGenerator('div', undefined,['class=modify']);
+		const modifyLink = elementGenerator('a',undefined, ['class=popup']);
+		const span = elementGenerator('span', 'modify');
+		const icon = elementGenerator('a', undefined, ['class=fa-regular fa-pen-to-square']);
+
 		modifyLink.appendChild(icon);
 		modifyLink.appendChild(span);
 		div.appendChild(myProjectHeader);
 		div.appendChild(modifyLink);
 		portfolio.prepend(div);
 		renderGallery(works);
-
-
+		logout();
+		openModal();
 	}
 }
 
+function elementGenerator( type, text, attributes = []){
+	let element = document.createElement(type);
+	if(text){
+		element.textContent = text;
+	}
+
+	attributes
+			.map(attr => attr.split('='))
+			.forEach(([name, value]) =>{
+			element.setAttribute(name, value);
+});
+return element;
+}
+
+function renderNav(logged){
+	const nav = document.querySelector('nav');
+	nav.innerHTML = `<ul>
+			<li><a href='./index.html'>projets</a></li>
+			<li><a href='#contact'>contact</a></li>
+			<li><a id='${logged}' href='./login.html'>${logged}</a></li>
+			<li><img src='./assets/icons/instagram.png' alt='Instagram'></li>
+			</ul>`;
+}
 
 // filter through different categories
 function showCategories(event) {
@@ -120,19 +128,18 @@ function showCategories(event) {
 }
 
 
-// function logout() {
-// 	if(document.querySelector('#logout')){
-
-
-// 	const logout = document.querySelector('#logout');
-
-// 	logout.addEventListener('onclick', (event) => {
-// 		event.preventDefault();
-// 		window.sessionStorage.clear();
-// 		window.location.replace('./login.html');
-// 	});
-// }
-// }
+function logout() {
+	if (document.getElementById('logout')) {
+		console.log();
+		const logout = document.getElementById('logout');
+		logout.addEventListener('click', () => {
+			window.sessionStorage.clear();
+			window.location.replace('./index.html');
+		});
+	}else{
+		console.log('test logout');
+	}
+}
 
 
 function renderGallery(works) {
@@ -141,7 +148,7 @@ function renderGallery(works) {
 	for (let work of works) {
 		gallery.innerHTML += `<figure>
 		 				<img src="${work.imageUrl}" alt="${work.title}">
-		 				<figcaption>${work.title}</figcaption>`;
+		 				<figcaption>${work.title}</figcaption></figure>`;
 	}
 }
 
@@ -193,3 +200,50 @@ function publishMenu() {
 
 getAllWorks();
 addCatButtons();
+
+
+
+function openModal(){
+	const openModalButton = document.querySelector('.popup');
+	const closeModalButtons = document.querySelector('.close-button');
+	const overlay = document.getElementById('overlay');
+
+openModalButton.addEventListener('click', () => {
+    const modal = document.querySelector('#modal');
+    openModal(modal);
+  });
+
+
+overlay.addEventListener('click', () => {
+  const modal = document.querySelector('.modal.active');
+    closeModal(modal);
+});
+
+closeModalButtons.addEventListener('click', () => {
+	const modal = document.querySelector('.modal');
+    closeModal(modal);
+  });
+
+
+function openModal(modal) {
+  if (modal == null) {return;};
+  modal.classList.add('active');
+  overlay.classList.add('active');
+}
+
+function closeModal(modal) {
+  if (modal == null) {return;};
+  modal.classList.remove('active');
+  overlay.classList.remove('active');
+}
+const works = JSON.parse(localStorage.getItem('works'));
+const modal = document.querySelector('.modal-body');
+
+	modal.innerHTML = '';
+	for (let work of works) {
+		modal.innerHTML += `<div class="modal-item">
+		 				<img src="${work.imageUrl}" alt="${work.title}">
+						 <button class="del-image"><i class="fa-solid fa-trash-can"></i></button>
+		 				<a href="#">éditer</a></div>`;
+	}
+}
