@@ -555,14 +555,14 @@ nav a:active {
 .close-button {
 	position: absolute;
 	top: 32px;
-	right: 36px;
+	right: 50px;
 	cursor: pointer;
 	border: none;
 	outline: none;
+	height: 12px;
+	width: 12px;
 	background: none;
-	font-size: 20px;
-	font-weight: bold;
-	text-align: right;
+	font-size: 24px;
 }
 
 .modal-body {
@@ -572,7 +572,6 @@ nav a:active {
 	width: 70%;
 	flex-flow: row wrap;
 	align-items: flex-start;
-	justify-content: space-between;
 	border-bottom: 1px solid #B3B3B3;
 	padding-bottom: 45px;
 }
@@ -600,11 +599,13 @@ nav a:active {
 	margin-bottom: 0;
 	text-decoration: none;
 	font-family: "Work Sans";
+	color: #000;
 	font-size: 12px;
 	font-weight: 400;
 }
 
 .del-image{
+	display: block;
 	cursor: pointer;
 	position: absolute;
 	top: 17px;
@@ -619,9 +620,11 @@ nav a:active {
 	color: #FFFFFF;
 	width: 17px;
 	height: 17px;
+
 }
 
 .fa-trash-can{
+	pointer-events: none;
 	height: 9px;
 	width: 9px;
 }

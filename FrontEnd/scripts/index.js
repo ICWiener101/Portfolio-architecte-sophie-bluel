@@ -1,7 +1,4 @@
-
-
 const url = 'http://localhost:5678/api/';
-
 
 
 //get all the works from the API and Load the homepage
@@ -32,7 +29,7 @@ async function getAllWorks() {
 }
 
 //add categories and modify if logged in
-async function addCatButtons() {
+async function generateHomepage() {
 
 	const response = await fetch(url + 'categories/',
 		{
@@ -68,7 +65,7 @@ async function addCatButtons() {
 			buttons[i].addEventListener('click', showCategories);
 		}
 	} else {
-		publishMenu();
+		topPublishMenu();
 
 		const works = JSON.parse(window.localStorage.getItem('works'));
 
@@ -88,6 +85,7 @@ async function addCatButtons() {
 		renderGallery(works);
 		logout();
 		openModal();
+		deleteSelected();
 	}
 }
 
@@ -167,7 +165,7 @@ async function uploadWork() {
 	const options = {
 		method: 'POST',
 		headers: {
-			Authorization: `Bearer ${token}`
+			'Authorization': `Bearer ${token}`
 		},
 		body: JSON.stringify(data)
 	};
@@ -177,17 +175,12 @@ async function uploadWork() {
 	return result;
 }
 
-function publishMenu() {
-	const div = document.createElement('div');
-	div.setAttribute('class', 'publish');
-	const modifyLink = document.createElement('a');
-	modifyLink.href = '#';
-	const span = document.createElement('span');
-	span.textContent = 'Mode édition';
-	const button = document.createElement('button');
-	button.textContent = 'publier les changements';
-	const icon = document.createElement('i');
-	icon.classList.add('fa-regular', 'fa-pen-to-square');
+function topPublishMenu() {
+	const div = elementGenerator('div', undefined, ['class=publish']);
+	const modifyLink = elementGenerator('a', undefined, ['href=#']);
+	const span = elementGenerator('span', 'Mode édition', []);
+	const button = elementGenerator('button', 'publier les changements', []);
+	const icon = elementGenerator('i', undefined, ['class=fa-regular fa-pen-to-square']);
 	div.appendChild(modifyLink);
 	document.querySelector('body').prepend(div);
 	modifyLink.appendChild(icon);
@@ -196,20 +189,17 @@ function publishMenu() {
 
 }
 
-
-
 getAllWorks();
-addCatButtons();
-
+generateHomepage();
 
 
 function openModal(){
 	const openModalButton = document.querySelector('.popup');
-	const closeModalButtons = document.querySelector('.close-button');
+	const closeModalButton = document.querySelector('.close-button');
 	const overlay = document.getElementById('overlay');
 
 openModalButton.addEventListener('click', () => {
-    const modal = document.querySelector('#modal');
+    const modal = document.querySelector('.modal');
     openModal(modal);
   });
 
@@ -219,7 +209,7 @@ overlay.addEventListener('click', () => {
     closeModal(modal);
 });
 
-closeModalButtons.addEventListener('click', () => {
+closeModalButton.addEventListener('click', () => {
 	const modal = document.querySelector('.modal');
     closeModal(modal);
   });
@@ -236,14 +226,60 @@ function closeModal(modal) {
   modal.classList.remove('active');
   overlay.classList.remove('active');
 }
-const works = JSON.parse(localStorage.getItem('works'));
+loadModalImages();
+}
+
+function loadModalImages(){
+	const works = JSON.parse(localStorage.getItem('works'));
 const modal = document.querySelector('.modal-body');
+
 
 	modal.innerHTML = '';
 	for (let work of works) {
 		modal.innerHTML += `<div class="modal-item">
 		 				<img src="${work.imageUrl}" alt="${work.title}">
-						 <button class="del-image"><i class="fa-solid fa-trash-can"></i></button>
+						 <button class="del-image" data-image-id=${work.id}>
+						 <i class="fa-solid fa-trash-can"></i>
+						 </button>
 		 				<a href="#">éditer</a></div>`;
 	}
+}
+
+function deleteSelected(){
+
+	const deleteBtns = document.querySelectorAll('[data-image-id]');
+
+	deleteBtns.forEach(button => {
+		button.addEventListener('click', (e) => {
+			const id = e.target.dataset.imageId;
+			console.log(id);
+			e.target.parentElement.remove();
+			// delWork(id);
+			// loadModalImages();
+		});
+	});
+}
+
+
+// async function delWork(id){
+
+// 	const url = 'http://localhost:5678/api/works/';
+// 	const token = window.sessionStorage.getItem('token');
+// 	console.log(token);
+// 	const options = {
+// 		method: 'delete',
+// 		headers: {
+// 			'accept': '*/*',
+// 			'Authorization': `Bearer ${token}`
+// 		}
+// 	};
+
+// 	await fetch(url + `${id}`, options);
+
+// }
+
+function addPhotoModal(){
+
+
+
 }
