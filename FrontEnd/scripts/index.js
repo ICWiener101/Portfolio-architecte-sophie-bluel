@@ -82,10 +82,10 @@ async function generateHomepage() {
 		div.appendChild(myProjectHeader);
 		div.appendChild(modifyLink);
 		portfolio.prepend(div);
+
 		renderGallery(works);
 		logout();
-		openModal();
-		deleteSelected();
+		openGalleryModal();
 	}
 }
 
@@ -193,9 +193,9 @@ getAllWorks();
 generateHomepage();
 
 
-function openModal(){
+function openGalleryModal(){
 	const openModalButton = document.querySelector('.popup');
-	const closeModalButton = document.querySelector('.close-button');
+	const closeModalButton = document.querySelector('.close-button-1');
 	const overlay = document.getElementById('overlay');
 
 openModalButton.addEventListener('click', () => {
@@ -219,6 +219,7 @@ function openModal(modal) {
   if (modal == null) {return;};
   modal.classList.add('active');
   overlay.classList.add('active');
+  loadModalImages();
 }
 
 function closeModal(modal) {
@@ -226,12 +227,11 @@ function closeModal(modal) {
   modal.classList.remove('active');
   overlay.classList.remove('active');
 }
-loadModalImages();
 }
 
 function loadModalImages(){
 	const works = JSON.parse(localStorage.getItem('works'));
-const modal = document.querySelector('.modal-body');
+	const modal = document.querySelector('.modal-body');
 
 
 	modal.innerHTML = '';
@@ -243,6 +243,9 @@ const modal = document.querySelector('.modal-body');
 						 </button>
 		 				<a href="#">éditer</a></div>`;
 	}
+
+	addPhotoModal();
+	deleteSelected();
 }
 
 function deleteSelected(){
@@ -279,7 +282,33 @@ function deleteSelected(){
 // }
 
 function addPhotoModal(){
+const galleryModal = document.querySelector('.modal.active');
+const addImgBtn = document.querySelector('.modal-input>button');
+const closeFormModal = document.querySelector('.close-button-2');
+addImgBtn.addEventListener('click', () => {
+
+    const modalForm = document.querySelector('.modal-form');
+    openModalForm(modalForm);
+  });
+
+  closeFormModal.addEventListener('click', () => {
+	const modal = document.querySelector('.modal');
+    closeModal(modal);
+  });
 
 
+function openModalForm(modalForm) {
+
+	if (modalForm == null) {return;};
+	modalForm.classList.add('active');
+	closeModal(galleryModal);
+  }
+
+
+  function closeModal(modal) {
+  if (modal == null) {return;};
+  modal.classList.remove('active');
+
+}
 
 }

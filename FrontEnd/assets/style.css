@@ -511,7 +511,7 @@ nav a:active {
 
 /*modal*/
 
-.modal {
+.modal, .modal-form{
 	position: relative;
 	display: flex;
 	flex-flow: column;
@@ -531,7 +531,7 @@ nav a:active {
 	padding: 30px;
 }
 
-.modal.active {
+.modal.active, .modal-form.active{
 	transform: translate(-50%, -50%) scale(1);
 }
 
@@ -540,6 +540,29 @@ nav a:active {
 	justify-content: space-between;
 	align-items: center;
 
+}
+
+.back-to-gallery{
+	background-color: transparent;
+	border: none;
+	color: #000;
+	cursor: pointer;
+	border: none;
+	outline: none;
+	height: 12px;
+	width: 12px;
+	background: none;
+	font-size: 24px;
+}
+
+.fa-arrow-left-long{
+	font-weight: 100;
+}
+
+.modal-nav{
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
 }
 
 .modal-title {
@@ -552,10 +575,19 @@ nav a:active {
 	margin-bottom: 46px;
 }
 
-.close-button {
+.close-button-1 {
 	position: absolute;
 	top: 32px;
 	right: 50px;
+	cursor: pointer;
+	border: none;
+	outline: none;
+	height: 12px;
+	width: 12px;
+	background: none;
+	font-size: 24px;
+}
+.close-button-2{
 	cursor: pointer;
 	border: none;
 	outline: none;
@@ -629,7 +661,7 @@ nav a:active {
 	width: 9px;
 }
 
-.modal-input{
+.modal-input, .modal-form-input{
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -638,6 +670,21 @@ nav a:active {
 .modal-input>button{
 	cursor: pointer;
 	background-color: #1D6154;
+	height: 36px;
+	width: 237px;
+	border-radius: 60px;
+	border:none;
+	font-family: 'Syne';
+	font-size: 14px;
+	font-weight: 700;
+	color: #FFFFFF;
+	margin-top: 38px;
+	margin-bottom: 23px;
+}
+
+#imgSubmit{
+	cursor: pointer;
+	background-color: #A7A7A7;
 	height: 36px;
 	width: 237px;
 	border-radius: 60px;

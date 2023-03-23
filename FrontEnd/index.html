@@ -58,7 +58,9 @@
 		</section>
 		<section>
 			<div class="modal">
-				<button class="close-button"><i class="fa-solid fa-xmark"></i></button>
+				<div class="modal-nav">
+					<button class="close-button-1"><i class="fa-solid fa-xmark"></i></button>
+				</div>
 				<div class="modal-header">
 					<h2 class="modal-title">Galerie photo</h2>
 				</div>
@@ -72,7 +74,37 @@
 			</div>
 			<div id="overlay"></div>
 		</section>
-
+		<section>
+			<div class="modal-form">
+				<div class="modal-nav">
+					<button class="back-to-gallery"><i class="fa-solid fa-arrow-left-long"></i></button>
+					<button class="close-button-2"><i class="fa-solid fa-xmark"></i></button>
+				</div>
+				<div class="modal-form-header">
+					<h2 class="modal-form-title">Ajout photo</h2>
+				</div>
+				<form id="addWork">
+					<input type="file" id="img" name="img" accept="file_extension: .jpg, png">
+					<div class="name">
+						<label for="email">Titre</label>
+						<input id="title" type="title" name="title"></input>
+					</div>
+						<div class="password">
+							<label for="category">Catégorie</label>
+							<select id="categories" name="categories">
+							<datalist id="categories">
+								<option value="Objets" >Objets</option>
+								<option value="Appartements" >Appartements</option>
+								<option value="Hotels" >Hotels</option>
+							</datalist>
+						</div>
+				</form>
+				<div class="modal-form-input">
+					<input id="imgSubmit" type="submit" value="Valider">
+				</div>
+			</div>
+			<div id="overlay"></div>
+		</section>
 
 	</main>
 
