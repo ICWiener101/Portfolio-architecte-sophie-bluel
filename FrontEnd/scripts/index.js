@@ -247,16 +247,25 @@ async function delWork(id) {
 
 	const url = 'http://localhost:5678/api/works/';
 	const token = window.sessionStorage.getItem('token');
-	console.log(token);
-	const options = {
-		method: 'delete',
-		headers: {
-			'accept': '*/*',
-			'Authorization': `Bearer ${token}`
-		}
-	};
+	try{
 
-	await fetch(url + `${id}`, options);
+		const options = {
+			method: 'delete',
+			headers: {
+				'accept': '*/*',
+				'Authorization': `Bearer ${token}`
+			}
+		};
+
+		const response = await fetch(url + `${id}`, options);
+
+		if(!response.ok){
+			const error = await response.json();
+			throw new Error(`Error: ${error.message}`);
+		}
+	}catch(err){
+		alert(err.message);
+	}
 
 }
 
@@ -320,7 +329,7 @@ function addPhotoModal() {
 			document.querySelector('.display-img').style.display = 'flex';
 			const reader = new FileReader();
 			const image = ev.target.files[0];
-			console.log(image);
+
 			reader.onload = () => {
 				const img = document.createElement('img');
 				img.src = reader.result;
@@ -354,6 +363,7 @@ function addPhotoModal() {
 		valider.classList.add('activated');
 
 		await uploadWork(formData);
+		//show uploaded image in the gallery after upload
 		const gallery = document.querySelector('.gallery');
 		gallery.innerHTML += `<figure data-figure-id=${category.value}>
 								 <img src="${image.files[0].result}" alt="${title.value}">
@@ -366,6 +376,7 @@ function addPhotoModal() {
 						 <i class="fa-solid fa-trash-can"></i>
 						 </button>
 		 				<a href="#">éditer</a></div>`;
+
 		const modalForm = document.querySelector('.modal-form');
 		const overlay = document.getElementById('overlay');
 
@@ -374,12 +385,9 @@ function addPhotoModal() {
 		image.files[0].value = '';
 		document.querySelector('.add-img').style.display = 'flex';
 		document.querySelector('.display-img').style.display = 'none';
-		document.querySelector('.img-preview img').remove();
+		document.querySelector('.img-preview').innerHTML = '';
 		modalForm.classList.remove('active');
 		overlay.classList.remove('active');
-
-
-
 
 
 	}
@@ -390,6 +398,7 @@ async function uploadWork(formData) {
 
 	const url = 'http://localhost:5678/api/works';
 
+try{
 
 	const token = window.sessionStorage.getItem('token');
 	const options = {
@@ -402,12 +411,16 @@ async function uploadWork(formData) {
 		body: formData
 	};
 
-	console.log('token', token);
-	console.log('payload', options.body);
 	const response = await fetch(url, options);
-
+	if(!response.ok){
+		const error = await response.json();
+		throw new Error(`Error: ${error.message}`);
+	}
 	const result = await response.json();
 	return result;
+}catch(err){
+	alert(err.message);
+}
 }
 
 
