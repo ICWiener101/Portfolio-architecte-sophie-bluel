@@ -333,7 +333,7 @@ footer nav ul {
 	flex-direction: column;
 }
 
-#email {
+#email, #title, #categories{
 	font-size: 20px;
 	font-family: inherit;
 	width: 100%;
@@ -343,6 +343,9 @@ footer nav ul {
 	margin-bottom: 30px;
 	margin-top: 6px;
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+}
+#categories{
+	margin-bottom: 0;
 }
 
 #password {
@@ -355,8 +358,15 @@ footer nav ul {
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
 }
 
+.modal-titleImg-form{
+	margin-top: 30px;
+	margin-bottom: 21px;
+}
+
 label[for='email'],
-label[for='password'] {
+label[for='password'],
+label[for='title'],
+label[for='categories'] {
 	font-family: 'Work Sans';
 	font-style: normal;
 	font-size: 14px;
@@ -511,7 +521,8 @@ nav a:active {
 
 /*modal*/
 
-.modal, .modal-form{
+.modal,
+.modal-form {
 	position: relative;
 	display: flex;
 	flex-flow: column;
@@ -524,14 +535,20 @@ nav a:active {
 	transition: 200ms ease-in-out;
 	border: none;
 	border-radius: 10px;
-	z-index: 10;
+	z-index: 1;
 	background-color: white;
 	width: 630px;
 	height: 730px;
 	padding: 30px;
 }
 
-.modal.active, .modal-form.active{
+.modal-form {
+	height: 670px;
+	justify-content: space-evenly;
+}
+
+.modal.active,
+.modal-form.active {
 	transform: translate(-50%, -50%) scale(1);
 }
 
@@ -542,27 +559,24 @@ nav a:active {
 
 }
 
-.back-to-gallery{
-	background-color: transparent;
+
+.back-to-gallery {
 	border: none;
 	color: #000;
 	cursor: pointer;
 	border: none;
-	outline: none;
-	height: 12px;
-	width: 12px;
 	background: none;
 	font-size: 24px;
 }
 
-.fa-arrow-left-long{
+.fa-arrow-left-long {
 	font-weight: 100;
 }
 
-.modal-nav{
+.modal-nav {
 	display: flex;
 	justify-content: space-between;
-	width: 100%;
+	width: 95%;
 }
 
 .modal-title {
@@ -587,12 +601,10 @@ nav a:active {
 	background: none;
 	font-size: 24px;
 }
-.close-button-2{
+
+.close-button-2 {
 	cursor: pointer;
 	border: none;
-	outline: none;
-	height: 12px;
-	width: 12px;
 	background: none;
 	font-size: 24px;
 }
@@ -626,7 +638,7 @@ nav a:active {
 	margin-bottom: 0;
 }
 
-.modal-item a{
+.modal-item a {
 	margin-top: 4px;
 	margin-bottom: 0;
 	text-decoration: none;
@@ -636,7 +648,7 @@ nav a:active {
 	font-weight: 400;
 }
 
-.del-image{
+.del-image {
 	display: block;
 	cursor: pointer;
 	position: absolute;
@@ -655,25 +667,36 @@ nav a:active {
 
 }
 
-.fa-trash-can{
+.fa-trash-can {
 	pointer-events: none;
 	height: 9px;
 	width: 9px;
 }
 
-.modal-input, .modal-form-input{
+.modal-form-title {
+	font-family: 'Work Sans';
+	font-style: normal;
+	font-weight: 400;
+	font-size: 26px;
+	line-height: 30px;
+	text-align: center;
+	color: #000000;
+}
+
+.modal-input,
+.modal-form-input {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 }
 
-.modal-input>button{
+.modal-input>button {
 	cursor: pointer;
 	background-color: #1D6154;
 	height: 36px;
 	width: 237px;
 	border-radius: 60px;
-	border:none;
+	border: none;
 	font-family: 'Syne';
 	font-size: 14px;
 	font-weight: 700;
@@ -682,27 +705,118 @@ nav a:active {
 	margin-bottom: 23px;
 }
 
-#imgSubmit{
+#imgSubmit {
 	cursor: pointer;
 	background-color: #A7A7A7;
 	height: 36px;
 	width: 237px;
 	border-radius: 60px;
-	border:none;
+	border: none;
 	font-family: 'Syne';
 	font-size: 14px;
 	font-weight: 700;
 	color: #FFFFFF;
 	margin-top: 38px;
 	margin-bottom: 23px;
+	text-align: center;
 }
-.modal-input a{
+
+#imgSubmit.activated{
+	cursor: pointer;
+	background-color: #1D6154;
+
+}
+
+.modal-input a {
 	text-decoration: none;
 	font-family: 'Syne';
 	font-size: 14px;
 	font-weight: 400;
 	font-style: normal;
 	color: #D65353;
+}
+
+.add-img, .display-img{
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	text-align: center;
+	background-color: #E8F1F6;
+	width: 420px;
+	height: 169px;
+	border-radius: 3px;
+	padding-top: 28px;
+	padding-bottom: 19px;
+	padding: 0;
+}
+
+.display-img{
+	display: none;
+}
+.img-preview{
+	margin-left: auto;
+	margin-right: auto;
+	width: 129px;
+}
+
+.img-preview img{
+	width: 100%;
+	height: 169px;
+	object-fit: contain;
+}
+
+.add-img input {
+	display: none;
+}
+
+.add-img label {
+	cursor: pointer;
+	background-color: #CBD6DC;
+	height: 36px;
+	width: 173px;
+	border-radius: 50px;
+	line-height: 16px;
+	font-family: 'Work Sans';
+	font-size: 14px;
+	font-weight: 500;
+	color: #306685;
+	display: flex;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	justify-content: center;
+	align-items: center;
+}
+
+.image-type {
+	margin-top: 7px;
+	font-family: 'Work Sans';
+	font-style: normal;
+	font-weight: 400;
+	font-size: 10px;
+	line-height: 12px;
+	text-align: center;
+	color: #444444;
+}
+
+.category{
+	border-bottom: 1px solid #B3B3B3;
+	padding-bottom: 47px;
+}
+.category select{
+	appearance: none;
+	color: #6C6C6C;
+}
+
+.fa-image {
+	margin-left: auto;
+	margin-right: auto;
+	color: #B9C5CC;
+	width: 68px;
+	height: 56px;
+	text-align: center;
+	margin-bottom: 21px;
+	margin-top: 28px;
 }
 
 #overlay {
@@ -721,4 +835,3 @@ nav a:active {
 	opacity: 1;
 	pointer-events: all;
 }
-

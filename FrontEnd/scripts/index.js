@@ -39,76 +39,83 @@ async function generateHomepage() {
 			}
 		});
 
-	const portfolio = document.querySelector('#portfolio');
-	const myProjectHeader = elementGenerator('h2', 'Mes projets');
-
-
 
 	if (window.sessionStorage.getItem('token') === null) {
 		const categories = await response.json();
+		window.localStorage.setItem('categories', JSON.stringify(categories));
 		const logged = 'login';
-		renderNav(logged);
+		renderNav(logged, logged);
+		generateHomeGuest(categories);
 
-		const btnContainer = elementGenerator('div', undefined, ['class=btnContainer']);
-
-		const allCat = elementGenerator('button', 'Tous', ['class=btn all']);
-		btnContainer.appendChild(allCat);
-		portfolio.prepend(btnContainer);
-		portfolio.prepend(myProjectHeader);
-		for (let cat of categories) {
-			const button = elementGenerator('button', `${cat.name}`, ['class=btn', `data-category-id=${cat.id}`]);
-			btnContainer.appendChild(button);
-		}
-
-		let buttons = document.querySelectorAll('.btn');
-		for (let i = 0; i < buttons.length; i++) {
-			buttons[i].addEventListener('click', showCategories);
-		}
 	} else {
-		topPublishMenu();
-
 		const works = JSON.parse(window.localStorage.getItem('works'));
-
-		const logged = 'logout';
-		renderNav(logged);
-
-		const div = elementGenerator('div', undefined,['class=modify']);
-		const modifyLink = elementGenerator('a',undefined, ['class=popup']);
-		const span = elementGenerator('span', 'modify');
-		const icon = elementGenerator('a', undefined, ['class=fa-regular fa-pen-to-square']);
-
-		modifyLink.appendChild(icon);
-		modifyLink.appendChild(span);
-		div.appendChild(myProjectHeader);
-		div.appendChild(modifyLink);
-		portfolio.prepend(div);
-
+		topPublishMenu();
+		generateHomeAdmin();
 		renderGallery(works);
 		logout();
 		openGalleryModal();
 	}
 }
 
-function elementGenerator( type, text, attributes = []){
-	let element = document.createElement(type);
-	if(text){
-		element.textContent = text;
-	}
+function generateHomeAdmin() {
+	const portfolio = document.querySelector('#portfolio');
+	const myProjectHeader = elementGenerator('h2', 'Mes projets');
 
-	attributes
-			.map(attr => attr.split('='))
-			.forEach(([name, value]) =>{
-			element.setAttribute(name, value);
-});
-return element;
+	const logged = 'logout';
+	const path = 'index';
+	renderNav(logged, path);
+
+	const div = elementGenerator('div', undefined, ['class=modify']);
+	const modifyLink = elementGenerator('a', undefined, ['class=popup']);
+	const span = elementGenerator('span', 'modify');
+	const icon = elementGenerator('a', undefined, ['class=fa-regular fa-pen-to-square']);
+
+	modifyLink.appendChild(icon);
+	modifyLink.appendChild(span);
+	div.appendChild(myProjectHeader);
+	div.appendChild(modifyLink);
+	portfolio.prepend(div);
 }
 
-function renderNav(logged){
+function generateHomeGuest(categories) {
+	const portfolio = document.querySelector('#portfolio');
+	const myProjectHeader = elementGenerator('h2', 'Mes projets');
+	const btnContainer = elementGenerator('div', undefined, ['class=btnContainer']);
+
+	const allCat = elementGenerator('button', 'Tous', ['class=btn all']);
+	btnContainer.appendChild(allCat);
+	portfolio.prepend(btnContainer);
+	portfolio.prepend(myProjectHeader);
+	for (let cat of categories) {
+		const button = elementGenerator('button', `${cat.name}`, ['class=btn', `data-category-id=${cat.id}`]);
+		btnContainer.appendChild(button);
+	}
+
+	let buttons = document.querySelectorAll('.btn');
+	for (let i = 0; i < buttons.length; i++) {
+		buttons[i].addEventListener('click', showCategories);
+	}
+}
+
+function elementGenerator(type, text, attributes = []) {
+	let element = document.createElement(type);
+	if (text) {
+		element.textContent = text;
+	}
+	attributes
+		.map(attr => attr.split('='))
+		.forEach(([name, value]) => {
+			element.setAttribute(name, value);
+		});
+	return element;
+}
+
+function renderNav(logged, path) {
 	const nav = document.querySelector('nav');
 	nav.innerHTML = `<ul>
 			<li><a href='./index.html'>projets</a></li>
 			<li><a href='#contact'>contact</a></li>
-			<li><a id='${logged}' href='./login.html'>${logged}</a></li>
+			<li><a id='${logged}' href='./${path}.html'>${logged}</a></li>
 			<li><img src='./assets/icons/instagram.png' alt='Instagram'></li>
 			</ul>`;
 }
@@ -128,14 +135,11 @@ function showCategories(event) {
 
 function logout() {
 	if (document.getElementById('logout')) {
-		console.log();
 		const logout = document.getElementById('logout');
 		logout.addEventListener('click', () => {
 			window.sessionStorage.clear();
 			window.location.replace('./index.html');
 		});
-	}else{
-		console.log('test logout');
 	}
 }
 
@@ -144,36 +148,13 @@ function renderGallery(works) {
 	const gallery = document.querySelector('.gallery');
 	gallery.innerHTML = '';
 	for (let work of works) {
-		gallery.innerHTML += `<figure>
+		gallery.innerHTML += `<figure data-figure-id=${work.id}>
 		 				<img src="${work.imageUrl}" alt="${work.title}">
 		 				<figcaption>${work.title}</figcaption></figure>`;
 	}
 }
 
 
-async function uploadWork() {
-
-	const url = 'http://localhost:5678/api/works';
-
-	const data = {
-		imageUrl: 'George',
-		title: 'test test',
-		categoryId: 1,
-	};
-
-	const token = window.sessionStorage.getItem('token');
-	const options = {
-		method: 'POST',
-		headers: {
-			'Authorization': `Bearer ${token}`
-		},
-		body: JSON.stringify(data)
-	};
-	const response = await fetch(url, options);
-
-	const result = await response.json();
-	return result;
-}
 
 function topPublishMenu() {
 	const div = elementGenerator('div', undefined, ['class=publish']);
@@ -193,46 +174,45 @@ getAllWorks();
 generateHomepage();
 
 
-function openGalleryModal(){
+function openGalleryModal() {
 	const openModalButton = document.querySelector('.popup');
 	const closeModalButton = document.querySelector('.close-button-1');
 	const overlay = document.getElementById('overlay');
 
-openModalButton.addEventListener('click', () => {
-    const modal = document.querySelector('.modal');
-    openModal(modal);
-  });
+	openModalButton.addEventListener('click', () => {
+		const modal = document.querySelector('.modal');
+		openModal(modal);
+	});
 
 
-overlay.addEventListener('click', () => {
-  const modal = document.querySelector('.modal.active');
-    closeModal(modal);
-});
+	overlay.addEventListener('click', () => {
+		const modal = document.querySelector('.modal.active');
+		closeModal(modal);
+	});
 
-closeModalButton.addEventListener('click', () => {
-	const modal = document.querySelector('.modal');
-    closeModal(modal);
-  });
+	closeModalButton.addEventListener('click', () => {
+		const modal = document.querySelector('.modal');
+		closeModal(modal);
+	});
 
 
-function openModal(modal) {
-  if (modal == null) {return;};
-  modal.classList.add('active');
-  overlay.classList.add('active');
-  loadModalImages();
+	function openModal(modal) {
+		if (modal == null) { return; };
+		modal.classList.add('active');
+		overlay.classList.add('active');
+		loadModalImages();
+	}
+
+	function closeModal(modal) {
+		if (modal == null) { return; };
+		modal.classList.remove('active');
+		overlay.classList.remove('active');
+	}
 }
 
-function closeModal(modal) {
-  if (modal == null) {return;};
-  modal.classList.remove('active');
-  overlay.classList.remove('active');
-}
-}
-
-function loadModalImages(){
+function loadModalImages() {
 	const works = JSON.parse(localStorage.getItem('works'));
 	const modal = document.querySelector('.modal-body');
-
 
 	modal.innerHTML = '';
 	for (let work of works) {
@@ -248,67 +228,195 @@ function loadModalImages(){
 	deleteSelected();
 }
 
-function deleteSelected(){
+function deleteSelected() {
 
 	const deleteBtns = document.querySelectorAll('[data-image-id]');
-
 	deleteBtns.forEach(button => {
 		button.addEventListener('click', (e) => {
 			const id = e.target.dataset.imageId;
-			console.log(id);
+			const figToRemove = document.querySelector(`[data-figure-id="${id}"]`);
+			figToRemove.remove();
 			e.target.parentElement.remove();
-			// delWork(id);
-			// loadModalImages();
+			delWork(id);
 		});
 	});
 }
 
 
-// async function delWork(id){
+async function delWork(id) {
 
-// 	const url = 'http://localhost:5678/api/works/';
-// 	const token = window.sessionStorage.getItem('token');
-// 	console.log(token);
-// 	const options = {
-// 		method: 'delete',
-// 		headers: {
-// 			'accept': '*/*',
-// 			'Authorization': `Bearer ${token}`
-// 		}
-// 	};
+	const url = 'http://localhost:5678/api/works/';
+	const token = window.sessionStorage.getItem('token');
+	console.log(token);
+	const options = {
+		method: 'delete',
+		headers: {
+			'accept': '*/*',
+			'Authorization': `Bearer ${token}`
+		}
+	};
 
-// 	await fetch(url + `${id}`, options);
-
-// }
-
-function addPhotoModal(){
-const galleryModal = document.querySelector('.modal.active');
-const addImgBtn = document.querySelector('.modal-input>button');
-const closeFormModal = document.querySelector('.close-button-2');
-addImgBtn.addEventListener('click', () => {
-
-    const modalForm = document.querySelector('.modal-form');
-    openModalForm(modalForm);
-  });
-
-  closeFormModal.addEventListener('click', () => {
-	const modal = document.querySelector('.modal');
-    closeModal(modal);
-  });
-
-
-function openModalForm(modalForm) {
-
-	if (modalForm == null) {return;};
-	modalForm.classList.add('active');
-	closeModal(galleryModal);
-  }
-
-
-  function closeModal(modal) {
-  if (modal == null) {return;};
-  modal.classList.remove('active');
+	await fetch(url + `${id}`, options);
 
 }
+
+function addPhotoModal() {
+	addSelectOptions();
+
+	const galleryModal = document.querySelector('.modal.active');
+	const addImgBtn = document.querySelector('.modal-input>button');
+	const closeFormModal = document.querySelector('.close-button-2');
+	const overlay = document.getElementById('overlay');
+	const backToGalleryModalBtn = document.querySelector('.back-to-gallery');
+
+	addImgBtn.addEventListener('click', () => {
+
+		const modalForm = document.querySelector('.modal-form');
+		galleryModal.classList.remove('active');
+		openModalForm(modalForm);
+	});
+
+	closeFormModal.addEventListener('click', () => {
+		const modal = document.querySelector('.modal-form');
+		galleryModal.classList.remove('active');
+		closeModal(modal);
+	});
+
+	backToGalleryModalBtn.addEventListener('click', () => {
+		const modalForm = document.querySelector('.modal-form');
+		modalForm.classList.remove('active');
+		galleryModal.classList.add('active');
+	});
+
+
+	overlay.addEventListener('click', () => {
+		const modal = document.querySelector('.modal-form.active');
+		closeModal(modal);
+	});
+
+	function openModalForm(modalForm) {
+		if (modalForm == null) { return; };
+		modalForm.classList.add('active');
+		overlay.classList.add('active');
+	}
+
+	function closeModal(modal) {
+		if (modal == null) { return; };
+		modal.classList.remove('active');
+		overlay.classList.remove('active');
+	}
+
+
+	const addWork = document.querySelector('#addWork');
+	addWork.addEventListener('submit', onSubmit);
+
+
+	document.querySelector('#browseImg').addEventListener('change', (ev) => {
+		if (!ev.target.files) {
+			return;
+		}
+		else {
+			document.querySelector('.add-img').style.display = 'none';
+			document.querySelector('.display-img').style.display = 'flex';
+			const reader = new FileReader();
+			const image = ev.target.files[0];
+			console.log(image);
+			reader.onload = () => {
+				const img = document.createElement('img');
+				img.src = reader.result;
+				img.alt = image.name;
+				document.querySelector('.img-preview').append(img);
+				Object.assign(image, { result: reader.result });
+
+			};
+			reader.readAsDataURL(image);
+
+		}
+	});
+
+
+
+	async function onSubmit(event) {
+		event.preventDefault();
+		const valider = document.getElementById('imgSubmit');
+
+		const formData = new FormData();
+		const title = document.querySelector('#title');
+		const category = document.querySelector('#categories');
+		const image = document.querySelector('#browseImg');
+
+		formData.append('image', image.files[0]);
+		formData.append('title', title.value);
+		formData.append('category', parseInt(category.value));
+
+
+
+		valider.classList.add('activated');
+
+		await uploadWork(formData);
+		const gallery = document.querySelector('.gallery');
+		gallery.innerHTML += `<figure data-figure-id=${category.value}>
+								 <img src="${image.files[0].result}" alt="${title.value}">
+								 <figcaption>${title.value}</figcaption></figure>`;
+
+		const modal = document.querySelector('.modal-body');
+		modal.innerHTML += `<div class="modal-item">
+		 				<img src="${image.files[0].result}" alt="${title.value}">
+						 <button class="del-image" data-image-id=${category.value}>
+						 <i class="fa-solid fa-trash-can"></i>
+						 </button>
+		 				<a href="#">éditer</a></div>`;
+		const modalForm = document.querySelector('.modal-form');
+		const overlay = document.getElementById('overlay');
+
+		title.value = '';
+		category.value = '';
+		image.files[0].value = '';
+		document.querySelector('.add-img').style.display = 'flex';
+		document.querySelector('.display-img').style.display = 'none';
+		document.querySelector('.img-preview img').remove();
+		modalForm.classList.remove('active');
+		overlay.classList.remove('active');
+
+
+
+
+
+	}
+
+}
+
+async function uploadWork(formData) {
+
+	const url = 'http://localhost:5678/api/works';
+
+
+	const token = window.sessionStorage.getItem('token');
+	const options = {
+		method: 'POST',
+		headers: {
+			'accept': 'application/json',
+			'Authorization': `Bearer ${token}`,
+			// 'Content-Type': 'multipart/form-data'
+		},
+		body: formData
+	};
+
+	console.log('token', token);
+	console.log('payload', options.body);
+	const response = await fetch(url, options);
+
+	const result = await response.json();
+	return result;
+}
+
+
+function addSelectOptions() {
+	const select = document.querySelector('#categories');
+	const categories = JSON.parse(window.localStorage.getItem('categories'));
+	for (let cat of categories) {
+		const option = elementGenerator('option', `${cat.name}`, [`value=${cat.id}`]);
+		select.appendChild(option);
+	}
 
 }
