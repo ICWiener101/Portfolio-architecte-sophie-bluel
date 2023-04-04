@@ -343,16 +343,25 @@ function fileHandler() {
 		}
 
 	});
+	const valider = document.getElementById('imgSubmit');
+
+	const formData = new FormData();
+	const title = document.querySelector('#title');
+	const category = document.querySelector('#categories');
+	const image = document.querySelector('#browseImg');
+
+	const inputList = [title, category, image];
+
+	inputList.forEach(function (input) {
+		input.addEventListener('input', () => {
+			if (image.files[0] && title.value && category.value) {
+				valider.classList.add('green');
+			}
+		});
+	});
 
 	async function onSubmit(event) {
 		event.preventDefault();
-		const valider = document.getElementById('imgSubmit');
-
-		const formData = new FormData();
-		const title = document.querySelector('#title');
-		const category = document.querySelector('#categories');
-		const image = document.querySelector('#browseImg');
-
 
 		formData.append('image', image.files[0]);
 		formData.append('title', title.value);
@@ -362,8 +371,6 @@ function fileHandler() {
 			return alert('Please fill all the fields!');
 		} else {
 
-
-			valider.style.backgroundColor = '#1D6154';
 			const result = await uploadWork(formData);
 			const works = JSON.parse(localStorage.getItem('works'));
 			window.localStorage.removeItem('works');
