@@ -403,6 +403,7 @@ function fileHandler() {
 			document.querySelector('.display-img').style.display = 'none';
 			modalForm.classList.remove('active');
 			overlay.classList.remove('active');
+			valider.classList.remove('green');
 
 
 		}
