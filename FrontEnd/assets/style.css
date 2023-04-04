@@ -721,6 +721,10 @@ nav a:active {
 	text-align: center;
 }
 
+#imgSubmit.green {
+	background-color: #1D6154;
+}
+
 
 .modal-input a {
 	text-decoration: none;

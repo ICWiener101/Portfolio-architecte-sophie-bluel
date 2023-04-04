@@ -321,7 +321,7 @@ function fileHandler() {
 			return;
 		}
 		else {
-			console.log(ev.target.files);
+
 			document.querySelector('.img-preview').innerHTML = '';
 			document.querySelector('.add-img').style.display = 'none';
 			document.querySelector('.display-img').style.display = 'flex';
@@ -345,7 +345,7 @@ function fileHandler() {
 	});
 	const valider = document.getElementById('imgSubmit');
 
-	const formData = new FormData();
+
 	const title = document.querySelector('#title');
 	const category = document.querySelector('#categories');
 	const image = document.querySelector('#browseImg');
@@ -362,7 +362,7 @@ function fileHandler() {
 
 	async function onSubmit(event) {
 		event.preventDefault();
-
+		const formData = new FormData();
 		formData.append('image', image.files[0]);
 		formData.append('title', title.value);
 		formData.append('category', parseInt(category.value));
