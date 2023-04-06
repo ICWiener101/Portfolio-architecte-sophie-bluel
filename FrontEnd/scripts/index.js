@@ -157,12 +157,8 @@ function renderGallery(works) {
         figure.appendChild(img);
         figure.appendChild(caption);
         gallery.appendChild(figure);
-        // gallery.innerHTML += `<figure data-figure-id=${work.id}>
-        //  				<img src="${work.imageUrl}" alt="${work.title}">
-        //  				<figcaption>${work.title}</figcaption></figure>`;
     }
 }
-
 
 //add the top black bar
 function topPublishMenu() {
@@ -179,15 +175,12 @@ function topPublishMenu() {
 
 }
 
-
-
 //manage modal
 function openModal() {
 
     renderModal();
     renderFormModal();
     fileHandler();
-
 
     const openModalButton = document.querySelector('.popup');
     const closeModalButton = document.querySelector('.close-button-1');
