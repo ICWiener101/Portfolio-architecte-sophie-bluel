@@ -26,13 +26,11 @@ async function onLogin(event) {
             }
 
             const result = await response.json();
-
             const token = result.token;
 
             window.sessionStorage.setItem('token', token);
             window.location = './index.html';
         } catch (err) {
-
             alert('Wrong email or password!');
         }
     } else {

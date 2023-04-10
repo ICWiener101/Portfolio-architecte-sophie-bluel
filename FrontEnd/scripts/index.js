@@ -8,51 +8,52 @@ async function getAllWorks() {
         const response = await fetch(url + 'works', {
             method: 'GET',
             headers: {
-                'Access-Control-Allow-Origin': '*',
                 'accept': 'application/json'
             }
         });
 
         const works = await response.json();
         window.localStorage.setItem('works', JSON.stringify(works));
-
-
         renderGallery(works);
-
         return works;
-
     } catch (err) {
         alert(err.message);
         throw err;
     }
-
 }
+
 
 //add categories and modify if logged in
 async function generateHomepage() {
-
-    const response = await fetch(url + 'categories/', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    });
-
-
-    if (window.sessionStorage.getItem('token') === null) {
-        const categories = await response.json();
-        window.localStorage.setItem('categories', JSON.stringify(categories));
-        const logged = 'login';
-        renderNav(logged, logged);
-        generateHomeGuest(categories);
-
-    } else {
+    try {
+        const response = await fetch(url + 'categories/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
         const works = JSON.parse(window.localStorage.getItem('works'));
-        topPublishMenu();
-        generateHomeAdmin();
-        renderGallery(works);
-        logout();
-        openModal();
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(`Error: ${error.message}`);
+        } else {
+            if (window.sessionStorage.getItem('token') === null) {
+                const categories = await response.json();
+                window.localStorage.setItem('categories', JSON.stringify(categories));
+                generateHomeGuest(categories);
+
+            } else {
+                topPublishMenu();
+                generateHomeAdmin();
+                renderGallery(works);
+                logout();
+                openModal();
+            }
+        }
+
+    } catch (err) {
+        alert(err.message);
     }
 }
 
@@ -79,6 +80,8 @@ function generateHomeAdmin() {
 
 //generating of homepage when guest
 function generateHomeGuest(categories) {
+    const logged = 'login';
+    renderNav(logged, logged);
     const portfolio = document.querySelector('#portfolio');
     const myProjectHeader = elementGenerator('h2', 'Mes projets');
     const btnContainer = elementGenerator('div', undefined, ['class=btnContainer']);
@@ -127,7 +130,7 @@ function renderNav(logged, path) {
 function showCategories(event) {
     const works = JSON.parse(localStorage.getItem('works'));
     if (event.target.className === 'btn all') {
-        getAllWorks();
+        renderGallery(works);
     } else {
         const workCategory = works.filter(i => i.categoryId == `${event.target.dataset.categoryId}`);
         renderGallery(workCategory);
@@ -218,13 +221,11 @@ function openModal() {
 
     closeModalButton.addEventListener('click', () => {
         const modal = document.querySelector('.modal');
-
         closeModal(modal);
     });
 
     closeFormModalButton.addEventListener('click', () => {
         const modal = document.querySelector('.modal-form');
-
         closeModal(modal);
     });
 
@@ -411,7 +412,6 @@ function fileHandler() {
             modalForm.classList.remove('active');
             overlay.classList.remove('active');
             valider.classList.remove('green');
-
         }
 
     }
@@ -420,7 +420,7 @@ function fileHandler() {
 
 //upload items to the server
 async function uploadWork(formData) {
-    //test
+
     const url = 'http://localhost:5678/api/works';
 
     try {
@@ -443,6 +443,7 @@ async function uploadWork(formData) {
             throw new Error(`Error: ${error.message}`);
         }
         const result = await response.json();
+
         return result;
     } catch (err) {
         alert(err.message);
