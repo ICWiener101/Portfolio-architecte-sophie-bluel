@@ -1,7 +1,7 @@
 const url = 'http://localhost:5678/api/';
 
 
-//get all the works from the API and Load the homepage
+//get all the works from the API
 async function getAllWorks() {
 
     try {
@@ -17,11 +17,9 @@ async function getAllWorks() {
             throw new Error(`Error: ${error.message}`);
         }
 
-        let works = JSON.parse(window.localStorage.getItem('works'));
-        if (works === null) {
-            works = await response.json();
-            window.localStorage.setItem('works', JSON.stringify(works));
-        }
+        const works = await response.json();
+        window.localStorage.setItem('works', JSON.stringify(works));
+
         return works;
     } catch (err) {
         alert(err.message);
@@ -44,11 +42,8 @@ async function getCategotries() {
             throw new Error(`Error: ${error.message}`);
         }
 
-        let categories = JSON.parse(window.localStorage.getItem('categories'));
-        if (categories === null) {
-            categories = await response.json();
-            window.localStorage.setItem('categories', JSON.stringify(categories));
-        }
+        const categories = await response.json();
+        window.localStorage.setItem('categories', JSON.stringify(categories));
 
         return categories;
     } catch (err) {
@@ -58,8 +53,14 @@ async function getCategotries() {
 
 //add categories and modify if logged in
 async function generateHomepage() {
-    const works = await getAllWorks();
-    const categories = await getCategotries();
+    let works = JSON.parse(window.localStorage.getItem('works'));
+    if (works === null) {
+        works = await getAllWorks();
+    }
+    let categories = JSON.parse(window.localStorage.getItem('categories'));
+    if (categories === null) {
+        categories = await getCategotries();
+    }
 
     if (window.sessionStorage.getItem('token') === null) {
         renderGallery(works);
@@ -211,7 +212,7 @@ function openModal() {
     const backToGalleryModalBtn = document.querySelector('.back-to-gallery');
     const galleryModal = document.querySelector('.modal');
     const addWork = document.querySelector('#addWork');
-
+    const deleteBtns = document.querySelectorAll('[data-image-id]');
 
     addImgBtn.addEventListener('click', () => {
         const modalForm = document.querySelector('.modal-form');
@@ -223,7 +224,6 @@ function openModal() {
     openModalButton.addEventListener('click', () => {
         const modal = document.querySelector('.modal');
         openModal(modal);
-        deleteSelected();
     });
 
     backToGalleryModalBtn.addEventListener('click', () => {
@@ -265,6 +265,10 @@ function openModal() {
 
     });
 
+    deleteBtns.forEach(button => {
+        button.addEventListener('click', deleteSelected);
+    });
+
     function openModal(modal) {
         if (modal == null) { return; };
         modal.classList.add('active');
@@ -303,28 +307,25 @@ function loadModalImages() {
 }
 
 //remove work from the DOM
-function deleteSelected() {
+function deleteSelected(e) {
+    const works = JSON.parse(localStorage.getItem('works'));
+    const idToRemove = e.target.dataset.imageId;
 
-    const deleteBtns = document.querySelectorAll('[data-image-id]');
-    deleteBtns.forEach(button => {
-        button.addEventListener('click', (e) => {
-            const idToRemove = e.target.dataset.imageId;
+    window.localStorage.removeItem('works');
 
-            const works = JSON.parse(localStorage.getItem('works'));
-            window.localStorage.removeItem('works');
+    const found = works.find(el => el.id == idToRemove);
+    const index = works.indexOf(found);
 
-            const found = works.find(el => el.id == idToRemove);
-            const index = works.indexOf(found);
+    works.splice(index, 1);
 
-            works.splice(index, 1);
+    const figToRemove = document.querySelector(`[data-figure-id="${idToRemove}"]`);
 
-            const figToRemove = document.querySelector(`[data-figure-id="${idToRemove}"]`);
-            figToRemove.remove();
-            e.target.parentElement.remove();
-            window.localStorage.setItem('works', JSON.stringify(works));
-            delWork(idToRemove);
-        });
-    });
+    figToRemove.remove();
+    e.target.parentElement.remove();
+    window.localStorage.setItem('works', JSON.stringify(works));
+    delWork(idToRemove);
+
+
 }
 
 
@@ -354,41 +355,41 @@ async function delWork(id) {
 
 }
 
+//image preview
+function imagePreview(ev) {
+    if (!ev.target.files) {
+        return;
+    } else {
+
+        document.querySelector('.img-preview').innerHTML = '';
+        document.querySelector('.add-img').style.display = 'none';
+        document.querySelector('.display-img').style.display = 'flex';
+
+        const reader = new FileReader();
+        const image = ev.target.files[0];
+
+        reader.onload = () => {
+
+            const img = document.createElement('img');
+            img.src = reader.result;
+            img.alt = image.name;
+            document.querySelector('.img-preview').append(img);
+            Object.assign(image, { result: reader.result });
+
+        };
+        reader.readAsDataURL(image);
+    }
+}
+
 //load image preview
 function fileHandler() {
     const addWork = document.querySelector('#addWork');
     addWork.addEventListener('submit', onSubmit);
+    //image preview event listener
+    document.querySelector('#browseImg').addEventListener('change', imagePreview);
 
-
-    document.querySelector('#browseImg').addEventListener('change', (ev) => {
-        if (!ev.target.files) {
-            return;
-        } else {
-
-            document.querySelector('.img-preview').innerHTML = '';
-            document.querySelector('.add-img').style.display = 'none';
-            document.querySelector('.display-img').style.display = 'flex';
-
-            const reader = new FileReader();
-            const image = ev.target.files[0];
-
-            reader.onload = () => {
-
-                const img = document.createElement('img');
-                img.src = reader.result;
-                img.alt = image.name;
-                document.querySelector('.img-preview').append(img);
-                Object.assign(image, { result: reader.result });
-
-            };
-            reader.readAsDataURL(image);
-
-        }
-
-    });
     //turn valider button green when all inputs are filled
     const valider = document.getElementById('imgSubmit');
-
 
     const title = document.querySelector('#title');
     const category = document.querySelector('#categories');
@@ -406,57 +407,68 @@ function fileHandler() {
         });
     });
 
-    async function onSubmit(event) {
-        event.preventDefault();
-        const formData = new FormData();
-        formData.append('image', image.files[0]);
-        formData.append('title', title.value);
-        formData.append('category', parseInt(category.value));
+}
+//process the form
+async function onSubmit(event) {
+    event.preventDefault();
+    const formData = new FormData();
+    const title = document.querySelector('#title');
+    const category = document.querySelector('#categories');
+    const image = document.querySelector('#browseImg');
+    const addWork = document.querySelector('#addWork');
+    const valider = document.getElementById('imgSubmit');
 
-        if (title.value == '' || image.files[0] == undefined || category.value == '') {
-            return alert('Please fill all the fields!');
-        } else {
-            //update the local storage with the added work
-            const result = await uploadWork(formData);
-            const works = JSON.parse(localStorage.getItem('works'));
-            window.localStorage.removeItem('works');
-            works.push(result);
-            window.localStorage.setItem('works', JSON.stringify(works));
-            //show uploaded image in the gallery after upload
-            const gallery = document.querySelector('.gallery');
-            gallery.innerHTML += `<figure data-figure-id=${result.id}>
-									 <img src="${result.imageUrl}" alt="${result.title}">
-									 <figcaption>${result.title}</figcaption></figure>`;
+    formData.append('image', image.files[0]);
+    formData.append('title', title.value);
+    formData.append('category', parseInt(category.value));
 
-            const modal = document.querySelector('.modal-body');
-            modal.innerHTML += `<div class="modal-item">
-							 <img src="${result.imageUrl}" alt="${result.title}">
-							 <button class="del-image" data-image-id=${result.id}>
-							 <i class="fa-solid fa-trash-can"></i>
-							 </button>
-							 <a href="#">éditer</a></div>`;
+    if (title.value == '' || image.files[0] == undefined || category.value == '') {
+        return alert('Please fill all the fields!');
+    } else {
+        //update the local storage with the added work
+        const result = await uploadWork(formData);
+        const works = JSON.parse(localStorage.getItem('works'));
+        window.localStorage.removeItem('works');
+        works.push(result);
+        window.localStorage.setItem('works', JSON.stringify(works));
+        //show uploaded image in the gallery after upload
+        const gallery = document.querySelector('.gallery');
+        gallery.innerHTML += `<figure data-figure-id=${result.id}>
+                                 <img src="${result.imageUrl}" alt="${result.title}">
+                                 <figcaption>${result.title}</figcaption></figure>`;
 
-            const modalForm = document.querySelector('.modal-form');
-            const overlay = document.getElementById('overlay');
+        const modal = document.querySelector('.modal-body');
+        const div = elementGenerator('div', undefined, ['class=modal-item']);
+        const img = elementGenerator('img', undefined, [`src=${result.imageUrl}`, `alt=${result.title}`]);
+        const button = elementGenerator('button', undefined, ['class=del-image', `data-image-id=${result.id}`]);
+        const icon = elementGenerator('i', undefined, ['class=fa-solid fa-trash-can']);
+        const a = elementGenerator('a', 'éditer', ['href=#']);
+        button.appendChild(icon);
+        div.appendChild(img);
+        div.appendChild(button);
+        div.appendChild(a);
+        modal.appendChild(div);
+        button.addEventListener('click', deleteSelected);
 
-            image.files[0].value = '';
-            addWork.reset();
+        const modalForm = document.querySelector('.modal-form');
+        const overlay = document.getElementById('overlay');
 
-            document.querySelector('.img-preview img').remove();
-            document.querySelector('.img-preview').innerHTML = '';
+        image.files[0].value = '';
+        addWork.reset();
 
-            document.querySelector('.add-img').style.display = 'flex';
-            document.querySelector('.display-img').style.display = 'none';
-            modalForm.classList.remove('active');
-            overlay.classList.remove('active');
-            valider.classList.remove('green');
-        }
+        document.querySelector('.img-preview img').remove();
+        document.querySelector('.img-preview').innerHTML = '';
 
+        document.querySelector('.add-img').style.display = 'flex';
+        document.querySelector('.display-img').style.display = 'none';
+        modalForm.classList.remove('active');
+        overlay.classList.remove('active');
+        valider.classList.remove('green');
     }
 
 }
 
-//upload items to the server
+//upload project to the server
 async function uploadWork(formData) {
 
     const url = 'http://localhost:5678/api/works';
