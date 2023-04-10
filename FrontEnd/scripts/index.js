@@ -12,9 +12,16 @@ async function getAllWorks() {
             }
         });
 
-        const works = await response.json();
-        window.localStorage.setItem('works', JSON.stringify(works));
-        renderGallery(works);
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(`Error: ${error.message}`);
+        }
+
+        let works = JSON.parse(window.localStorage.getItem('works'));
+        if (works === null) {
+            works = await response.json();
+            window.localStorage.setItem('works', JSON.stringify(works));
+        }
         return works;
     } catch (err) {
         alert(err.message);
@@ -22,9 +29,8 @@ async function getAllWorks() {
     }
 }
 
-
-//add categories and modify if logged in
-async function generateHomepage() {
+//get Categories
+async function getCategotries() {
     try {
         const response = await fetch(url + 'categories/', {
             method: 'GET',
@@ -32,29 +38,41 @@ async function generateHomepage() {
                 'Content-Type': 'application/json'
             }
         });
-        const works = JSON.parse(window.localStorage.getItem('works'));
 
         if (!response.ok) {
             const error = await response.json();
             throw new Error(`Error: ${error.message}`);
-        } else {
-            if (window.sessionStorage.getItem('token') === null) {
-                const categories = await response.json();
-                window.localStorage.setItem('categories', JSON.stringify(categories));
-                generateHomeGuest(categories);
-
-            } else {
-                topPublishMenu();
-                generateHomeAdmin();
-                renderGallery(works);
-                logout();
-                openModal();
-            }
         }
 
+        let categories = JSON.parse(window.localStorage.getItem('categories'));
+        if (categories === null) {
+            categories = await response.json();
+            window.localStorage.setItem('categories', JSON.stringify(categories));
+        }
+
+        return categories;
     } catch (err) {
         alert(err.message);
     }
+}
+
+//add categories and modify if logged in
+async function generateHomepage() {
+    const works = await getAllWorks();
+    const categories = await getCategotries();
+
+    if (window.sessionStorage.getItem('token') === null) {
+        renderGallery(works);
+        generateHomeGuest(categories);
+
+    } else {
+        topPublishMenu();
+        generateHomeAdmin();
+        renderGallery(works);
+        logout();
+        openModal();
+    }
+
 }
 
 //generating the homepage when logged in as admin
@@ -192,6 +210,8 @@ function openModal() {
     const addImgBtn = document.querySelector('.modal-input>button');
     const backToGalleryModalBtn = document.querySelector('.back-to-gallery');
     const galleryModal = document.querySelector('.modal');
+    const addWork = document.querySelector('#addWork');
+
 
     addImgBtn.addEventListener('click', () => {
         const modalForm = document.querySelector('.modal-form');
@@ -210,6 +230,10 @@ function openModal() {
         const modalForm = document.querySelector('.modal-form');
         modalForm.classList.remove('active');
         galleryModal.classList.add('active');
+        addWork.reset();
+        document.querySelector('.add-img').style.display = 'flex';
+        document.querySelector('.display-img').style.display = 'none';
+
     });
 
     overlay.addEventListener('click', () => {
@@ -217,16 +241,28 @@ function openModal() {
         const modalForm = document.querySelector('.modal-form.active');
         closeModal(modal);
         closeModal(modalForm);
+        addWork.reset();
+        document.querySelector('.add-img').style.display = 'flex';
+        document.querySelector('.display-img').style.display = 'none';
+
     });
 
     closeModalButton.addEventListener('click', () => {
         const modal = document.querySelector('.modal');
         closeModal(modal);
+        addWork.reset();
+        document.querySelector('.add-img').style.display = 'flex';
+        document.querySelector('.display-img').style.display = 'none';
+
     });
 
     closeFormModalButton.addEventListener('click', () => {
         const modal = document.querySelector('.modal-form');
         closeModal(modal);
+        addWork.reset();
+        document.querySelector('.add-img').style.display = 'flex';
+        document.querySelector('.display-img').style.display = 'none';
+
     });
 
     function openModal(modal) {
@@ -364,6 +400,8 @@ function fileHandler() {
         input.addEventListener('input', () => {
             if (image.files[0] && title.value && category.value) {
                 valider.classList.add('green');
+            } else {
+                valider.classList.remove('green');
             }
         });
     });
@@ -575,5 +613,4 @@ function renderFormModal() {
 
 }
 
-getAllWorks();
 generateHomepage();
